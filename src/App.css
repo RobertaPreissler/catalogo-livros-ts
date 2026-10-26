@@ -1,0 +1,280 @@
+
+/* ==============================
+   CONFIGURAÇÕES GERAIS
+============================== */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #252538;
+  background-color: #f4f5fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f4f5fb, #ecebff);
+}
+
+/* ==============================
+   ÁREA PRINCIPAL
+============================== */
+
+.container {
+  width: 92%;
+  max-width: 850px;
+  margin: 40px auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border: 1px solid #e9e7f5;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px #29205a12;
+}
+
+/* ==============================
+   TÍTULOS
+============================== */
+
+h1 {
+  margin: 0 0 12px;
+  color: #6042cf;
+  font-size: 2.2rem;
+  text-align: center;
+}
+
+.container > p {
+  margin-bottom: 30px;
+  color: #77758a;
+  text-align: center;
+  line-height: 1.6;
+}
+
+h2 {
+  margin-top: 0;
+  color: #30264f;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 12px;
+  color: #6042cf;
+  overflow-wrap: anywhere;
+}
+
+/* ==============================
+   FORMULÁRIO
+============================== */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 28px 0 36px;
+  padding: 24px;
+  background-color: #f8f7ff;
+  border: 1px solid #e9e4ff;
+  border-radius: 14px;
+}
+
+label {
+  color: #39364d;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  color: #252538;
+  background-color: #ffffff;
+  border: 1px solid #d8d5e5;
+  border-radius: 8px;
+  font: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: 3px solid #7657e833;
+  border-color: #7657e8;
+}
+
+/* ==============================
+   BOTÕES
+============================== */
+
+button {
+  min-height: 42px;
+  padding: 11px 16px;
+  color: #ffffff;
+  background-color: #6042cf;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #4930a8;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:focus-visible {
+  outline: 3px solid #9a86f4;
+  outline-offset: 3px;
+}
+
+form button {
+  margin-top: 8px;
+}
+
+/* ==============================
+   LISTA DE LIVROS
+============================== */
+
+section {
+  margin-top: 32px;
+}
+
+section h2 {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eceaf4;
+}
+
+ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ==============================
+   CARTÕES DOS LIVROS
+============================== */
+
+li {
+  min-width: 0;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e8e5f2;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px #29205a0a;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px #29205a12;
+}
+
+li p {
+  color: #68667a;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* ==============================
+   ETIQUETAS DE STATUS
+============================== */
+
+.status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status--read {
+  color: #176b43;
+  background-color: #dff7e9;
+}
+
+.status--unread {
+  color: #805414;
+  background-color: #fff0cc;
+}
+
+/* ==============================
+   BOTÕES EDITAR E REMOVER
+============================== */
+
+li button {
+  margin: 6px 6px 0 0;
+}
+
+li button:first-of-type {
+  color: #4930a8;
+  background-color: #eee9ff;
+}
+
+li button:first-of-type:hover {
+  background-color: #ddd4ff;
+}
+
+li button:last-of-type {
+  background-color: #d9485f;
+}
+
+li button:last-of-type:hover {
+  background-color: #b82f45;
+}
+
+/* ==============================
+   MENSAGENS DE ERRO
+============================== */
+
+[role="alert"] {
+  padding: 12px 14px;
+  color: #a52238;
+  background-color: #fff0f2;
+  border: 1px solid #f5c5ce;
+  border-radius: 8px;
+}
+
+/* ==============================
+   RESPONSIVIDADE
+============================== */
+
+@media (max-width: 600px) {
+  .container {
+    width: 94%;
+    margin: 18px auto;
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  form {
+    padding: 18px 14px;
+  }
+
+  ul {
+    grid-template-columns: 1fr;
+  }
+
+  li {
+    padding: 16px;
+  }
+
+  li button {
+    margin-top: 8px;
+  }
+}
