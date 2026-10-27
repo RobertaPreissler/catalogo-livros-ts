@@ -29,7 +29,9 @@ function BookForm({
     }
   }, [editingBook]);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     if (!title.trim() || !author.trim()) {
