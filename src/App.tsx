@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import BookList from "./BookList";
+import BookForm from "./BookForm";
 import {
   getBooks,
   addBook,
@@ -11,15 +12,11 @@ import {
 } from "./bookService";
 
 function App() {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [status, setStatus] = useState<"Lido" | "Não lido">("Não lido");
   const [books, setBooks] = useState<Book[]>([]);
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Buscar livros quando a página abrir
   useEffect(() => {
     async function loadBooks() {
       try {
@@ -32,84 +29,45 @@ function App() {
       }
     }
 
-    loadBooks();
+    void loadBooks();
   }, []);
 
-  // Limpar o formulário
-  function resetForm() {
-    setTitle("");
-    setAuthor("");
-    setStatus("Não lido");
-    setEditingId(null);
-  }
-
-  // Cadastrar ou atualizar um livro
-  async function handleSubmit() {
-    if (title.trim() === "" || author.trim() === "") {
-      alert("Preencha o título e o autor!");
-      return;
-    }
-
+  async function handleSave(
+    bookData: Omit<Book, "_id">
+  ): Promise<boolean> {
     try {
       setError("");
 
-      if (editingId) {
-        await updateBook(editingId, {
-          title: title.trim(),
-          author: author.trim(),
-          status,
+      if (editingBook?._id) {
+        await updateBook(editingBook._id, {
+          ...bookData,
+          _id: editingBook._id,
         });
 
         setBooks((currentBooks) =>
           currentBooks.map((book) =>
-            book._id === editingId
-              ? {
-                  ...book,
-                  title: title.trim(),
-                  author: author.trim(),
-                  status,
-                }
+            book._id === editingBook._id
+              ? { ...book, ...bookData }
               : book
           )
         );
       } else {
-        const newBook = await addBook({
-          title: title.trim(),
-          author: author.trim(),
-          status,
-        });
-
+        const newBook = await addBook(bookData);
         setBooks((currentBooks) => [...currentBooks, newBook]);
       }
 
-      resetForm();
+      setEditingBook(null);
+      return true;
     } catch {
       setError("Não foi possível salvar o livro. Tente novamente.");
+      return false;
     }
   }
 
-  // Colocar os dados do livro no formulário
-  function handleEdit(index: number) {
-    const book = books[index];
-
-    if (!book._id) {
-      setError("Não foi possível identificar esse livro.");
-      return;
-    }
-
-    setTitle(book.title);
-    setAuthor(book.author);
-    setStatus(book.status);
-    setEditingId(book._id);
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // Remover um livro da API
   async function handleRemoveBook(index: number) {
     const book = books[index];
 
-    if (!book._id) {
+    if (!book?._id) {
       setError("Não foi possível identificar esse livro.");
       return;
     }
@@ -119,15 +77,27 @@ function App() {
       await deleteBook(book._id);
 
       setBooks((currentBooks) =>
-        currentBooks.filter((_, currentIndex) => currentIndex !== index)
+        currentBooks.filter((currentBook) => currentBook._id !== book._id)
       );
 
-      if (editingId === book._id) {
-        resetForm();
+      if (editingBook?._id === book._id) {
+        setEditingBook(null);
       }
     } catch {
       setError("Não foi possível remover o livro.");
     }
+  }
+
+  function handleEdit(index: number) {
+    const book = books[index];
+
+    if (!book) {
+      setError("Não foi possível encontrar esse livro.");
+      return;
+    }
+
+    setEditingBook(book);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -135,54 +105,11 @@ function App() {
       <h1>📚 Catálogo de Livros</h1>
       <p>Cadastre e organize seus livros.</p>
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void handleSubmit();
-        }}
-      >
-        <h2>{editingId ? "Editar livro" : "Cadastrar livro"}</h2>
-
-        <label htmlFor="title">Título do livro</label>
-        <input
-          id="title"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Digite o título"
-          required
-        />
-
-        <label htmlFor="author">Autor</label>
-        <input
-          id="author"
-          value={author}
-          onChange={(event) => setAuthor(event.target.value)}
-          placeholder="Digite o autor"
-          required
-        />
-
-        <label htmlFor="status">Status de leitura</label>
-        <select
-          id="status"
-          value={status}
-          onChange={(event) =>
-            setStatus(event.target.value as "Lido" | "Não lido")
-          }
-        >
-          <option value="Não lido">Não lido</option>
-          <option value="Lido">Lido</option>
-        </select>
-
-        <button type="submit">
-          {editingId ? "Salvar alterações" : "Adicionar livro"}
-        </button>
-
-        {editingId && (
-          <button type="button" onClick={resetForm}>
-            Cancelar edição
-          </button>
-        )}
-      </form>
+      <BookForm
+        editingBook={editingBook}
+        onSave={handleSave}
+        onCancel={() => setEditingBook(null)}
+      />
 
       {error && <p role="alert">{error}</p>}
 

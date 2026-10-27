@@ -1,8 +1,4 @@
 
-import axios from "axios";
-
-const API_URL = `${import.meta.env.VITE_API_URL}/books`;
-
 export interface Book {
   _id?: string;
   title: string;
@@ -10,23 +6,51 @@ export interface Book {
   status: "Lido" | "Não lido";
 }
 
-// Buscar todos os livros
-export async function getBooks(): Promise<Book[]> {
-  const response = await axios.get<unknown>(API_URL);
+const STORAGE_KEY = "catalogo-livros";
 
-  if (!Array.isArray(response.data)) {
-    throw new Error(
-      "A API não retornou uma lista de livros. Confira a URL."
-    );
+function readBooks(): Book[] {
+  const savedBooks = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedBooks) {
+    return [];
   }
 
-  return response.data as Book[];
+  try {
+    const data: unknown = JSON.parse(savedBooks);
+
+    if (Array.isArray(data)) {
+      return data as Book[];
+    }
+
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function saveBooks(books: Book[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+}
+
+// Buscar todos os livros
+export async function getBooks(): Promise<Book[]> {
+  return readBooks();
 }
 
 // Cadastrar um livro
-export async function addBook(book: Book): Promise<Book> {
-  const response = await axios.post<Book>(API_URL, book);
-  return response.data;
+export async function addBook(
+  book: Omit<Book, "_id">
+): Promise<Book> {
+  const newBook: Book = {
+    ...book,
+    _id: crypto.randomUUID(),
+  };
+
+  const books = readBooks();
+  books.push(newBook);
+  saveBooks(books);
+
+  return newBook;
 }
 
 // Atualizar um livro
@@ -34,14 +58,21 @@ export async function updateBook(
   id: string,
   book: Book
 ): Promise<void> {
-  await axios.put(`${API_URL}/${id}`, {
-    title: book.title,
-    author: book.author,
-    status: book.status,
-  });
+  const books = readBooks();
+
+  const updatedBooks = books.map((currentBook) =>
+    currentBook._id === id
+      ? { ...currentBook, ...book, _id: id }
+      : currentBook
+  );
+
+  saveBooks(updatedBooks);
 }
 
 // Remover um livro
 export async function deleteBook(id: string): Promise<void> {
-  await axios.delete(`${API_URL}/${id}`);
+  const books = readBooks();
+  const remainingBooks = books.filter((book) => book._id !== id);
+
+  saveBooks(remainingBooks);
 }
